@@ -1,8 +1,7 @@
 ### Introduction to High Performance Computing
 #### Autumn, 2017
-#### Course material
 
-#### Annoucements (see (course webpage)[https://imperialhpsc.bitbucket.io] for further information) 
+#### Announcements (see [course webpage](https://imperialhpsc.bitbucket.io) for further information)
 13/10/17: 
 If you are having trouble using *pip install* during software installation, just use *pip3 install* instead.
 
