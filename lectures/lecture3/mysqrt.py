@@ -22,6 +22,6 @@ def sqrt2(a,x0=1):
             print("converged!")
             break
         x0 = x1
-
+        
 
     return x1

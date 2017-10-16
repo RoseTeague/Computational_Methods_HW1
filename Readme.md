@@ -2,6 +2,10 @@
 #### Autumn, 2017
 
 #### Announcements (see [course webpage](https://imperialhpsc.bitbucket.io) for further information)
+
+14/10/17:
+Modified and finalized details of assessment for the class have been posted
+
 13/10/17: 
 If you are having trouble using *pip install* during software installation, just use *pip3 install* instead.
 
