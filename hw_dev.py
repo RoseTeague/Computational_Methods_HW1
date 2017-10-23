@@ -1,4 +1,6 @@
 """M3C 2017 Homework 1
+Rosemary Teague
+00828351
 """
 import numpy as np
 import matplotlib.pyplot as plt
@@ -10,7 +12,14 @@ def rw2d(Nt,M,a=0,b=0):
     M: Number of simulations
     a,b: bias parameters
     """
+    Choice=np.random.randint(0,2,Nt)
+    Choice2=np.random.randint(0,2,Nt) #Makes a random choice of 0 or 1 for each of Nt time steps
+    #Assign the number 0 to a step of 1+a and the number 1 to a step of 1 in X
+    # and similarly for steps in Y. Cumulatively add up these steps to create random paths
+    X=np.cumsum(Choice*(1)+(1-Choice)*(1+a))
+    Y=np.cumsum(Choice2*(-1)+(1-Choice2)*(1-b))
 
+    
 def rwnet1(H,Hf,a=0,display=False):
     """Input variables
     H: Height at which new nodes are initially introduced
