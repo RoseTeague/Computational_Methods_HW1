@@ -3,6 +3,8 @@
 
 #### Announcements (see [course webpage](https://imperialhpsc.bitbucket.io) for further information)
 
+23/10/17: Several references have been added to the supplementary material section of the course webpage
+
 23/10/17: Homework 1 has been posted on the course webpage.
 
 19/10/17: Several updates have been made to the course webpage and repo: the final brownian motion code, *brown.py*
