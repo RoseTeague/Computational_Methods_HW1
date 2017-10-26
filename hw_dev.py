@@ -22,12 +22,15 @@ def rw2d(Nt,M,a=0,b=0):
         # and similarly for steps in Y. Cumulatively add up these steps to create random paths
         x=np.cumsum(Choice*(1)+(1-Choice)*(1+a))
         y=np.cumsum(Choice2*(-1)+(1-Choice2)*(1-b))
+        #Adds each successive path, M, at each timestep. All in the format of Nt dimensional arrays
         X=X+x
         Y=Y+y
         X2=X2+np.multiply(x,x)
         Y2=Y2+np.multiply(y,y)
         XY=XY+np.multiply(x,y)
 
+    #converts each averaged output to a list, ensures the starting position is at zero and divides by
+    #the total number of paths traversed. Stores the values(lists) to be returned in one list. 
     output=[X,Y,X2,Y2,XY]
     for i in range(5):
         output[i]=(output[i]/M).tolist()
