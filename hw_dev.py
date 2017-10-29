@@ -58,31 +58,36 @@ def rwnet1(H,Hf,a=0,display=False):
 
     #assert a==-1,0,1 \
     #    "a should be -1, 0 or +1"
-    M=20
+    M=500
     D=np.sqrt(1+(1+a)**2)
     G=nx.Graph()
     G.add_node(0,pos=(0,0))
-    #G.add_node(1,pos=(0,H))
     pos=nx.get_node_attributes(G,'pos')
     l=len(pos)
+    x=[0]
+    y=[0]
 
     for m in range(M):
-        poslist=rw2d(50,1,a,1)
+        poslist=rw2d(500,1,a,1)
 
         X=poslist[0]
-        Y=poslist[1]+(np.zeros(51)+H)
+        Y=poslist[1]+(np.zeros(501)+H)
         BRK=0
 
-        for i in range(51):
+        for i in range(501):
             new_node_pos=(X[i],Y[i])
             for j in np.arange(l-1,-1,-1):
                 d=np.sqrt((new_node_pos[0]-pos[j][0])**2+(new_node_pos[1]-pos[j][1])**2)
                 if d<=D:
                     G.add_node(l,pos=new_node_pos)
                     BRK=1
+                    x.append(new_node_pos[0])
+                    y.append(new_node_pos[1])
                     break
                 elif new_node_pos[1]==0:
                     G.add_node(l,pos=new_node_pos)
+                    x.append(new_node_pos[0])
+                    y.append(new_node_pos[1])
                     BRK=1
                     break
                 else:
@@ -93,10 +98,18 @@ def rwnet1(H,Hf,a=0,display=False):
             else:
                 break
 
+        if y[-1]>=Hf:
+            G.remove_node(l)
+            break
+
         pos=nx.get_node_attributes(G,'pos')
         l=len(pos)
 
-    return G,pos,X,Y#,output
+    if display==True:
+        nx.draw_networkx(G,pos,node_size=6,with_labels=False)
+        plt.show()
+
+    return G,pos,x,y#,output
 
 def rwnet2(L,H,Hf,a=0,display=False):
     """Input variables
