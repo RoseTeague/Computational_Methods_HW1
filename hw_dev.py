@@ -84,24 +84,124 @@ def rwnet1(H,Hf,a=0,display=False):
 
         for i in range(M+1):
             new_node_pos=(X[i],Y[i])
-            for j in np.arange(l-1,-1,-1):
-                d=np.sqrt((new_node_pos[0]-pos[j][0])**2+(new_node_pos[1]-pos[j][1])**2)
-                if d<=D:
+            if a==0:
+                if new_node_pos[1]==0:
                     BRK=1
-                    break
-                elif new_node_pos[1]==0:
-                    BRK=1
-                    break
                 else:
-                    continue
-
-            if BRK == 0:
-                continue
-            else:
+                    y1=-1
+                    n_1,n0,n1=y.count(new_node_pos[1]-1),y.count(new_node_pos[1]),y.count(new_node_pos[1]+1)
+                    #print(n_1,n0,n1)
+                    for n in range(n_1):
+                        y1=y.index(new_node_pos[1]-1,y1+1)
+                        if (np.abs(new_node_pos[0]-x[y1]))<=1:
+                            BRK=1
+                            break
+                        else:
+                            continue
+                    y1=-1
+                    for n in range(n0):
+                        y1=y.index(new_node_pos[1],y1+1)
+                        if (np.abs(new_node_pos[0]-x[y1]))<=1:
+                            BRK=1
+                            break
+                        else:
+                            continue
+                    y1=-1
+                    for n in range(n1):
+                        y1=y.index(new_node_pos[1]+1,y1+1)
+                        if (np.abs(new_node_pos[0]-x[y1]))<=1:
+                            BRK=1
+                            break
+                        else:
+                            continue
+            if a==-1:
+                if new_node_pos[1]==0:
+                    BRK=1
+                    #print('hello')
+                else:
+                    y1=-1
+                    n_1,n0,n1=y.count(new_node_pos[1]-1),y.count(new_node_pos[1]),y.count(new_node_pos[1]+1)
+                    #print(n_1,n0,n1)
+                    for n in range(n_1):
+                        #print(n,new_node_pos)
+                        y1=y.index(new_node_pos[1]-1,y1+1)
+                        if (np.abs(new_node_pos[0]-x[y1]))<=0:
+                            BRK=1
+                            break
+                        else:
+                            continue
+                    y1=-1
+                    for n in range(n0):
+                        #print(n,new_node_pos)
+                        y1=y.index(new_node_pos[1],y1+1)
+                        if (np.abs(new_node_pos[0]-x[y1]))<=1:
+                            BRK=1
+                            break
+                        else:
+                            continue
+                    y1=-1
+                    for n in range(n1):
+                        #print(n,new_node_pos)
+                        y1=y.index(new_node_pos[1]+1,y1+1)
+                        if (np.abs(new_node_pos[0]-x[y1]))<=0:
+                            BRK=1
+                            break
+                        else:
+                            continue
+            elif a==1:
+                if new_node_pos[1]==0:
+                    BRK=1
+                else:
+                    y1=-1
+                    n_2,n_1,n0,n1,n2=y.count(new_node_pos[1]-2),y.count(new_node_pos[1]-1),y.count(new_node_pos[1]),y.count(new_node_pos[1]+1),y.count(new_node_pos[1]+2),
+                    #print(n_1,n0,n1)
+                    for n in range(n_2):
+                        y1=y.index(new_node_pos[1]-2,y1+1)
+                        if (np.abs(new_node_pos[0]-x[y1]))<=1:
+                            BRK=1
+                            break
+                        else:
+                            continue
+                    y1=-1
+                    for n in range(n_1):
+                        y1=y.index(new_node_pos[1]-1,y1+1)
+                        if (np.abs(new_node_pos[0]-x[y1]))<=2:
+                            BRK=1
+                            break
+                        else:
+                            continue
+                    y1=-1
+                    for n in range(n0):
+                        y1=y.index(new_node_pos[1],y1+1)
+                        if (np.abs(new_node_pos[0]-x[y1]))<=2:
+                            BRK=1
+                            break
+                        else:
+                            continue
+                    y1=-1
+                    for n in range(n1):
+                        y1=y.index(new_node_pos[1]+1,y1+1)
+                        if (np.abs(new_node_pos[0]-x[y1]))<=2:
+                            BRK=1
+                            break
+                        else:
+                            continue
+                    y1=-1
+                    for n in range(n2):
+                        y1=y.index(new_node_pos[1]+2,y1+1)
+                        if (np.abs(new_node_pos[0]-x[y1]))<=1:
+                            BRK=1
+                            break
+                        else:
+                            continue
+            if BRK==1:
                 G.add_node(l,pos=new_node_pos)
                 x.append(new_node_pos[0])
                 y.append(new_node_pos[1])
+                #print(n_1,n0,n1,X[i],Y[i])
                 break
+            else:
+                continue
 
         if y[-1]>=Hf:
             G.remove_node(l)
