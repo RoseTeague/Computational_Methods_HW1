@@ -5,6 +5,7 @@ Rosemary Teague
 import numpy as np
 import matplotlib.pyplot as plt
 import networkx as nx
+import time
 
 def rw2d(Nt,M,a=0,b=0):
     """Input variables
@@ -12,6 +13,9 @@ def rw2d(Nt,M,a=0,b=0):
     M: Number of simulations
     a,b: bias parameters
     """
+
+    start = time.time()
+
     assert a>=-1, \
         "a should not be less than -1"
     assert b<=1, \
@@ -28,18 +32,21 @@ def rw2d(Nt,M,a=0,b=0):
         x=np.cumsum(Choice*(-1)+(1-Choice)*(1+a))
         y=np.cumsum(Choice2*(-1)+(1-Choice2)*(1-b))
         #Adds each successive path, M, at each timestep. All in the format of Nt dimensional arrays
-        X=X+x
-        Y=Y+y
-        X2=X2+np.multiply(x,x)
-        Y2=Y2+np.multiply(y,y)
-        XY=XY+np.multiply(x,y)
+        x=np.insert(x,0,0)
+        y=np.insert(y,0,0)
+        X2=np.multiply(x,x)
+        Y2=np.multiply(y,y)
+        XY=np.multiply(x,y)
 
     #converts each averaged output to a list, ensures the starting position is at zero and divides by
     #the total number of paths traversed. Stores the values(lists) to be returned in one list.
-    output=[X,Y,X2,Y2,XY]
+    output=[x,y,X2,Y2,XY]
     for i in range(5):
         output[i]=(output[i]/M).tolist()
         output[i][:0]=[0]
+
+    end = time.time()
+    #print(end-start)
 
     return output
 
@@ -55,10 +62,11 @@ def rwnet1(H,Hf,a=0,display=False):
     output: a tuple containing any other information you would
     like the function to return, may be left empty
     """
+    start = time.time()
+    assert a in [-1,0,1], \
+        "a should be -1, 0 or 1"
 
-    #assert a==-1,0,1 \
-    #    "a should be -1, 0 or +1"
-    M=500
+    M=H*10
     D=np.sqrt(1+(1+a)**2)
     G=nx.Graph()
     G.add_node(0,pos=(0,0))
@@ -68,26 +76,20 @@ def rwnet1(H,Hf,a=0,display=False):
     y=[0]
 
     for m in range(M):
-        poslist=rw2d(500,1,a,1)
+        poslist=rw2d(M,1,a,1)
 
         X=poslist[0]
-        Y=poslist[1]+(np.zeros(501)+H)
+        Y=[yi+H for yi in poslist[1]]
         BRK=0
 
-        for i in range(501):
+        for i in range(M+1):
             new_node_pos=(X[i],Y[i])
             for j in np.arange(l-1,-1,-1):
                 d=np.sqrt((new_node_pos[0]-pos[j][0])**2+(new_node_pos[1]-pos[j][1])**2)
                 if d<=D:
-                    G.add_node(l,pos=new_node_pos)
                     BRK=1
-                    x.append(new_node_pos[0])
-                    y.append(new_node_pos[1])
                     break
                 elif new_node_pos[1]==0:
-                    G.add_node(l,pos=new_node_pos)
-                    x.append(new_node_pos[0])
-                    y.append(new_node_pos[1])
                     BRK=1
                     break
                 else:
@@ -96,6 +98,9 @@ def rwnet1(H,Hf,a=0,display=False):
             if BRK == 0:
                 continue
             else:
+                G.add_node(l,pos=new_node_pos)
+                x.append(new_node_pos[0])
+                y.append(new_node_pos[1])
                 break
 
         if y[-1]>=Hf:
@@ -108,6 +113,9 @@ def rwnet1(H,Hf,a=0,display=False):
     if display==True:
         nx.draw_networkx(G,pos,node_size=6,with_labels=False)
         plt.show()
+
+    end = time.time()
+    print(end-start)
 
     return G,pos,x,y#,output
 
