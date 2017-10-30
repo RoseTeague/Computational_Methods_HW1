@@ -51,6 +51,16 @@ def rw2d(Nt,M,a=0,b=0):
     return output
 
 
+def test(n,l,d,y,x,X,Y,BRK):
+    if BRK==0:
+        y1=-1
+        for i in range(n):
+            y1=y.index(Y+l,y1+1)
+            if (np.abs(X-x[y1]))<=d:
+                BRK=1
+    return BRK
+
+
 def rwnet1(H,Hf,a=0,display=False):
     """Input variables
     H: Height at which new nodes are initially introduced
@@ -83,122 +93,31 @@ def rwnet1(H,Hf,a=0,display=False):
         BRK=0
 
         for i in range(M+1):
-            new_node_pos=(X[i],Y[i])
-            if a==0:
-                if new_node_pos[1]==0:
-                    BRK=1
-                else:
-                    y1=-1
-                    n_1,n0,n1=y.count(new_node_pos[1]-1),y.count(new_node_pos[1]),y.count(new_node_pos[1]+1)
-                    #print(n_1,n0,n1)
-                    for n in range(n_1):
-                        y1=y.index(new_node_pos[1]-1,y1+1)
-                        if (np.abs(new_node_pos[0]-x[y1]))<=1:
-                            BRK=1
-                            break
-                        else:
-                            continue
-                    y1=-1
-                    for n in range(n0):
-                        y1=y.index(new_node_pos[1],y1+1)
-                        if (np.abs(new_node_pos[0]-x[y1]))<=1:
-                            BRK=1
-                            break
-                        else:
-                            continue
-                    y1=-1
-                    for n in range(n1):
-                        y1=y.index(new_node_pos[1]+1,y1+1)
-                        if (np.abs(new_node_pos[0]-x[y1]))<=1:
-                            BRK=1
-                            break
-                        else:
-                            continue
-            if a==-1:
-                if new_node_pos[1]==0:
-                    BRK=1
-                    #print('hello')
-                else:
-                    y1=-1
-                    n_1,n0,n1=y.count(new_node_pos[1]-1),y.count(new_node_pos[1]),y.count(new_node_pos[1]+1)
-                    #print(n_1,n0,n1)
-                    for n in range(n_1):
-                        #print(n,new_node_pos)
-                        y1=y.index(new_node_pos[1]-1,y1+1)
-                        if (np.abs(new_node_pos[0]-x[y1]))<=0:
-                            BRK=1
-                            break
-                        else:
-                            continue
-                    y1=-1
-                    for n in range(n0):
-                        #print(n,new_node_pos)
-                        y1=y.index(new_node_pos[1],y1+1)
-                        if (np.abs(new_node_pos[0]-x[y1]))<=1:
-                            BRK=1
-                            break
-                        else:
-                            continue
-                    y1=-1
-                    for n in range(n1):
-                        #print(n,new_node_pos)
-                        y1=y.index(new_node_pos[1]+1,y1+1)
-                        if (np.abs(new_node_pos[0]-x[y1]))<=0:
-                            BRK=1
-                            break
-                        else:
-                            continue
-            elif a==1:
-                if new_node_pos[1]==0:
-                    BRK=1
-                else:
-                    y1=-1
-                    n_2,n_1,n0,n1,n2=y.count(new_node_pos[1]-2),y.count(new_node_pos[1]-1),y.count(new_node_pos[1]),y.count(new_node_pos[1]+1),y.count(new_node_pos[1]+2),
-                    #print(n_1,n0,n1)
-                    for n in range(n_2):
-                        y1=y.index(new_node_pos[1]-2,y1+1)
-                        if (np.abs(new_node_pos[0]-x[y1]))<=1:
-                            BRK=1
-                            break
-                        else:
-                            continue
-                    y1=-1
-                    for n in range(n_1):
-                        y1=y.index(new_node_pos[1]-1,y1+1)
-                        if (np.abs(new_node_pos[0]-x[y1]))<=2:
-                            BRK=1
-                            break
-                        else:
-                            continue
-                    y1=-1
-                    for n in range(n0):
-                        y1=y.index(new_node_pos[1],y1+1)
-                        if (np.abs(new_node_pos[0]-x[y1]))<=2:
-                            BRK=1
-                            break
-                        else:
-                            continue
-                    y1=-1
-                    for n in range(n1):
-                        y1=y.index(new_node_pos[1]+1,y1+1)
-                        if (np.abs(new_node_pos[0]-x[y1]))<=2:
-                            BRK=1
-                            break
-                        else:
-                            continue
-                    y1=-1
-                    for n in range(n2):
-                        y1=y.index(new_node_pos[1]+2,y1+1)
-                        if (np.abs(new_node_pos[0]-x[y1]))<=1:
-                            BRK=1
-                            break
-                        else:
-                            continue
+            if Y[i]==0:
+                BRK=1
+            else:
+                if a==0:
+                    n_1,n0,n1=y.count(Y[i]-1),y.count(Y[i]),y.count(Y[i]+1)
+                    BRK=test(n_1,-1,1,y,x,X[i],Y[i],BRK)
+                    BRK=test(n0,0,1,y,x,X[i],Y[i],BRK)
+                    BRK=test(n1,1,1,y,x,X[i],Y[i],BRK)
+                elif a==-1:
+                    n_1,n0,n1=y.count(Y[i]-1),y.count(Y[i]),y.count(Y[i]+1)
+                    BRK=test(n_1,-1,0,y,x,X[i],Y[i],BRK)
+                    BRK=test(n0,0,1,y,x,X[i],Y[i],BRK)
+                    BRK=test(n1,1,0,y,x,X[i],Y[i],BRK)
+                elif a==1:
+                    n_2,n_1,n0,n1,n2=y.count(Y[i]-2),y.count(Y[i]-1),y.count(Y[i]),y.count(Y[i]+1),y.count(Y[i]+2)
+                    BRK=test(n_2,-2,1,y,x,X[i],Y[i],BRK)
+                    BRK=test(n_1,-1,2,y,x,X[i],Y[i],BRK)
+                    BRK=test(n0,0,2,y,x,X[i],Y[i],BRK)
+                    BRK=test(n1,1,2,y,x,X[i],Y[i],BRK)
+                    BRK=test(n2,2,1,y,x,X[i],Y[i],BRK)
+
             if BRK==1:
-                G.add_node(l,pos=new_node_pos)
-                x.append(new_node_pos[0])
-                y.append(new_node_pos[1])
-                #print(n_1,n0,n1,X[i],Y[i])
+                G.add_node(l,pos=(X[i],Y[i]))
+                x.append(X[i])
+                y.append(Y[i])
                 break
             else:
                 continue
