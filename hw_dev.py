@@ -72,7 +72,7 @@ def rwnet1(H,Hf,a=0,display=False,analyze=False):
     output: a tuple containing any other information you would
     like the function to return, may be left empty
     """
-    start = time.time()
+    #start = time.time()
     assert a in [-1,0,1], \
         "a should be -1, 0 or 1"
 
@@ -119,12 +119,9 @@ def rwnet1(H,Hf,a=0,display=False,analyze=False):
             if BRK==1:
                 G.add_node(l,pos=(X[i],Y[i]))
                 if analyze==True:
-                    print('YES',Y[i],max(y))
                     if Y[i]>max(y):
-                        print('add')
                         ymax.append(Y[i])
-                        t=time.time()
-                        tmax.append(t-start)
+                        tmax.append(l)
                 x.append(X[i])
                 y.append(Y[i])
                 break
@@ -139,15 +136,18 @@ def rwnet1(H,Hf,a=0,display=False,analyze=False):
         l=len(pos)
 
     if display==True:
+        n='H='+str(H)+',Hf='+str(Hf)+',a='+str(a)
         nx.draw_networkx(G,pos,node_size=6,with_labels=False)
-        plt.show()
+        plt.title(n)
+        plt.savefig(n)
+        plt.close()
 
-    end = time.time()
-    print(end-start)
+    #end = time.time()
+    #print(end-start)
 
     return G,pos,x,y,ymax,tmax#,output
 
-def rwnet2(L,H,Hf,a=0,display=False):
+def rwnet2(L,H,Hf,a=0,display=False,analyze=False):
     """Input variables
     L: Walls are placed at X = +/- L
     H: Height at which new nodes are initially introduced
@@ -159,7 +159,7 @@ def rwnet2(L,H,Hf,a=0,display=False):
     output: a tuple containing any other information you would
     like the function to return, may be left empty
     """
-    start = time.time()
+    #start = time.time()
     assert a in [-1,0,1], \
         "a should be -1, 0 or 1"
 
@@ -171,6 +171,8 @@ def rwnet2(L,H,Hf,a=0,display=False):
     l=len(pos)
     x=[0]
     y=[0]
+    ymax=[]
+    tmax=[]
 
     for m in range(M):
         poslist=rw2d(M,1,a,1)
@@ -180,9 +182,9 @@ def rwnet2(L,H,Hf,a=0,display=False):
         BRK=0
 
         for i in range(M+1):
-            if Y[i]==0:
+            if Y[i]<=0:
                 BRK=1
-            elif np.abs(X[i])==L:
+            elif np.abs(X[i])>=L:
                 BRK=1
             else:
                 if a==0:
@@ -205,6 +207,10 @@ def rwnet2(L,H,Hf,a=0,display=False):
 
             if BRK==1:
                 G.add_node(l,pos=(X[i],Y[i]))
+                if analyze==True:
+                    if Y[i]>max(y):
+                        ymax.append(Y[i])
+                        tmax.append(l)
                 x.append(X[i])
                 y.append(Y[i])
                 break
@@ -219,23 +225,70 @@ def rwnet2(L,H,Hf,a=0,display=False):
         l=len(pos)
 
     if display==True:
+        n='H='+str(H)+',Hf='+str(Hf)+',a='+str(a)+',L='+str(L)
         nx.draw_networkx(G,pos,node_size=6,with_labels=False)
-        plt.show()
+        plt.title(n)
+        plt.savefig(n)
+        plt.close()
 
-    end = time.time()
-    print(end-start)
+    #end = time.time()
+    #print(end-start)
 
-    return G,pos,x,y
+    return G,pos,x,y,ymax,tmax
+
+def plotting(x1,y1,x2,y2,L=0):
+
+    if L==0:
+        n='L=Infinity'
+    else:
+        n='L='+str(L)
+
+    one,=plt.plot(x1,y1,'b-')
+    two,=plt.plot(x2,y2,'g-')
+    one.set_label('alpha=0')
+    two.set_label('alpha=1')
+    plt.xlabel('time')
+    plt.ylabel('network height')
+    plt.title(n)
+    plt.legend()
+
 
 def analyze():
-    """ Add input variables as needed
+    """ No inmput variables required for analasis.
+    Y of highest node plotted against the iteration it corresponds to for the following cases:
+    Figure 1: L=infinity uses input from rwnet1, plots the trends for when a=0 and a=1 as comparison
+    Figure 2: L=30 uses input from rwnet2, plots the trends for when a=0 and a=1 as comparison.
+        Note that in this case, L<<Hf and so most of the graphs height will be a result of nodes 'sticking' to the Walls.
+        For the case when a=0 we don't expect any height as the
+    Figure 3: L=150 uses input from rwnet2, plots the trends for when a=0 and a-1 as comparison.
+        Note in this case L=Hf and so most of the height from the graph will be a result of nodes sticking to other nodes.
     """
-    G,pos,x,y,ymax,tmax=rwnet1(200,150,0,analyze=True)
-    plt.plot(tmax,ymax)
-    plt.show()
+
+    G,pos,x,y,ymax0i,tmax0i=rwnet1(200,150,0,display=True,analyze=True)
+    G,pos,x,y,ymax1i,tmax1i=rwnet1(200,150,1,display=True,analyze=True)
+
+    fig1=plotting(tmax0i,ymax0i,tmax1i,ymax1i)
+    plt.savefig('hw11.png')
+    plt.close()
+
+    G,pos,x,y,ymax0j,tmax0j=rwnet2(30,200,150,0,display=True,analyze = True)
+    G,pos,x,y,ymax1j,tmax1j=rwnet2(30,200,150,1,display=True,analyze = True)
+
+    fig2=plotting(tmax0j,ymax0j,tmax1j,ymax1j,30)
+    plt.savefig('hw12.png')
+    plt.close()
+
+    G,pos,x,y,ymax0k,tmax0k=rwnet2(150,200,150,0,display=True,analyze = True)
+    G,pos,x,y,ymax1k,tmax1k=rwnet2(150,200,150,1,display=True,analyze = True)
+
+    fig3=plotting(tmax0k,ymax0k,tmax1k,ymax1k,150)
+    plt.savefig('hw13.png')
+    plt.close()
+
+    return
 
 
-def network(X,Y,dstar,display=False,degree=False):
+def network(x,y,dstar,display=False,degree=False):
     """ Input variables
     X,Y: Numpy arrays containing network node coordinates
     dstar2: Links are placed between nodes within a distance, d<=dstar of each other
@@ -246,6 +299,27 @@ def network(X,Y,dstar,display=False,degree=False):
     G: NetworkX graph corresponding to X,Y,dstar
     D: degree distribution, only returned when degree is true
     """
+    l=[]
+    g=nx.Graph()
+
+    dstar=np.sqrt(2)
+    for j in range(len(y)):
+        links=[i for i in np.arange(j+1,len(y)) if np.sqrt(np.abs(x[i]-x[j])**2+np.abs(y[i]-y[j])**2)<=dstar]
+        l.append(links)
+    #print(l)
+
+    for j in range(len(l)):
+        if len(l[j])>0:
+            g.add_node(j)
+            for i in range(len(l[j])):
+                #print('j=',j,'lj=',l[j],'i=',i,'lij=',l[j][i])
+                g.add_edge(j,l[j][i])
+    #print(len(g.node))
+    #plt.plot(nx.degree_histogram(g))
+    nx.draw_networkx(g,node_size=6,with_labels=False)
+    plt.title('Connections Network')
+    plt.savefig('Network of points')
+    plt.show()
 
 
 
