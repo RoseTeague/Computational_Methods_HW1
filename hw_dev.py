@@ -61,8 +61,95 @@ def test(n,l,d,y,x,X,Y,BRK):
     return BRK
 
 
-def rwnet1(H,Hf,a=0,display=False):
+def rwnet1(H,Hf,a=0,display=False,analyze=False):
     """Input variables
+    H: Height at which new nodes are initially introduced
+    Hf: Final network height
+    a: horizontal bias parameter, should be -1, 0, or 1
+    display: figure displaying the network is created when true
+    Output variables
+    X,Y: Final node coordinates
+    output: a tuple containing any other information you would
+    like the function to return, may be left empty
+    """
+    start = time.time()
+    assert a in [-1,0,1], \
+        "a should be -1, 0 or 1"
+
+    M=H*10
+    D=np.sqrt(1+(1+a)**2)
+    G=nx.Graph()
+    G.add_node(0,pos=(0,0))
+    pos=nx.get_node_attributes(G,'pos')
+    l=len(pos)
+    x=[0]
+    y=[0]
+    ymax=[]
+    tmax=[]
+
+    for m in range(M):
+        poslist=rw2d(M,1,a,1)
+
+        X=poslist[0]
+        Y=[yi+H for yi in poslist[1]]
+        BRK=0
+
+        for i in range(M+1):
+            if Y[i]==0:
+                BRK=1
+            else:
+                if a==0:
+                    n_1,n0,n1=y.count(Y[i]-1),y.count(Y[i]),y.count(Y[i]+1)
+                    BRK=test(n_1,-1,1,y,x,X[i],Y[i],BRK)
+                    BRK=test(n0,0,1,y,x,X[i],Y[i],BRK)
+                    BRK=test(n1,1,1,y,x,X[i],Y[i],BRK)
+                elif a==-1:
+                    n_1,n0,n1=y.count(Y[i]-1),y.count(Y[i]),y.count(Y[i]+1)
+                    BRK=test(n_1,-1,0,y,x,X[i],Y[i],BRK)
+                    BRK=test(n0,0,1,y,x,X[i],Y[i],BRK)
+                    BRK=test(n1,1,0,y,x,X[i],Y[i],BRK)
+                elif a==1:
+                    n_2,n_1,n0,n1,n2=y.count(Y[i]-2),y.count(Y[i]-1),y.count(Y[i]),y.count(Y[i]+1),y.count(Y[i]+2)
+                    BRK=test(n_2,-2,1,y,x,X[i],Y[i],BRK)
+                    BRK=test(n_1,-1,2,y,x,X[i],Y[i],BRK)
+                    BRK=test(n0,0,2,y,x,X[i],Y[i],BRK)
+                    BRK=test(n1,1,2,y,x,X[i],Y[i],BRK)
+                    BRK=test(n2,2,1,y,x,X[i],Y[i],BRK)
+
+            if BRK==1:
+                G.add_node(l,pos=(X[i],Y[i]))
+                if analyze==True:
+                    print('YES',Y[i],max(y))
+                    if Y[i]>max(y):
+                        print('add')
+                        ymax.append(Y[i])
+                        t=time.time()
+                        tmax.append(t-start)
+                x.append(X[i])
+                y.append(Y[i])
+                break
+            else:
+                continue
+
+        if y[-1]>=Hf:
+            G.remove_node(l)
+            break
+
+        pos=nx.get_node_attributes(G,'pos')
+        l=len(pos)
+
+    if display==True:
+        nx.draw_networkx(G,pos,node_size=6,with_labels=False)
+        plt.show()
+
+    end = time.time()
+    print(end-start)
+
+    return G,pos,x,y,ymax,tmax#,output
+
+def rwnet2(L,H,Hf,a=0,display=False):
+    """Input variables
+    L: Walls are placed at X = +/- L
     H: Height at which new nodes are initially introduced
     Hf: Final network height
     a: horizontal bias parameter, should be -1, 0, or 1
@@ -94,6 +181,8 @@ def rwnet1(H,Hf,a=0,display=False):
 
         for i in range(M+1):
             if Y[i]==0:
+                BRK=1
+            elif np.abs(X[i])==L:
                 BRK=1
             else:
                 if a==0:
@@ -136,26 +225,15 @@ def rwnet1(H,Hf,a=0,display=False):
     end = time.time()
     print(end-start)
 
-    return G,pos,x,y#,output
-
-def rwnet2(L,H,Hf,a=0,display=False):
-    """Input variables
-    L: Walls are placed at X = +/- L
-    H: Height at which new nodes are initially introduced
-    Hf: Final network height
-    a: horizontal bias parameter, should be -1, 0, or 1
-    display: figure displaying the network is created when true
-    Output variables
-    X,Y: Final node coordinates
-    output: a tuple containing any other information you would
-    like the function to return, may be left empty
-    """
-
-    return X,Y,output
+    return G,pos,x,y
 
 def analyze():
     """ Add input variables as needed
     """
+    G,pos,x,y,ymax,tmax=rwnet1(200,150,0,analyze=True)
+    plt.plot(tmax,ymax)
+    plt.show()
+
 
 def network(X,Y,dstar,display=False,degree=False):
     """ Input variables
