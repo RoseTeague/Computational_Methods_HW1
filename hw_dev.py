@@ -6,6 +6,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 import networkx as nx
 import time
+import matplotlib.animation as animation
 
 def rw2d(Nt,M,a=0,b=0):
     """Input variables
@@ -76,6 +77,7 @@ def rwnet1(H,Hf,a=0,display=False,analyze=False):
     assert a in [-1,0,1], \
         "a should be -1, 0 or 1"
 
+    plt.close()
     M=H*10
     D=np.sqrt(1+(1+a)**2)
     G=nx.Graph()
@@ -137,10 +139,11 @@ def rwnet1(H,Hf,a=0,display=False,analyze=False):
 
     if display==True:
         n='H='+str(H)+',Hf='+str(Hf)+',a='+str(a)
-        nx.draw_networkx(G,pos,node_size=6,with_labels=False)
+        #nx.draw_networkx(G,pos,node_size=6,with_labels=False)
+        plt.plot(x,y,'ro')
         plt.title(n)
         plt.savefig(n)
-        plt.close()
+        plt.show()
 
     #end = time.time()
     #print(end-start)
@@ -163,6 +166,7 @@ def rwnet2(L,H,Hf,a=0,display=False,analyze=False):
     assert a in [-1,0,1], \
         "a should be -1, 0 or 1"
 
+    plt.close()
     M=H*10
     D=np.sqrt(1+(1+a)**2)
     G=nx.Graph()
@@ -182,9 +186,10 @@ def rwnet2(L,H,Hf,a=0,display=False,analyze=False):
         BRK=0
 
         for i in range(M+1):
+            if np.abs(X[i])>=L:
+                X[i]=L
+
             if Y[i]<=0:
-                BRK=1
-            elif np.abs(X[i])>=L:
                 BRK=1
             else:
                 if a==0:
@@ -218,7 +223,7 @@ def rwnet2(L,H,Hf,a=0,display=False,analyze=False):
                 continue
 
         if y[-1]>=Hf:
-            G.remove_node(l)
+            #G.remove_node(l)
             break
 
         pos=nx.get_node_attributes(G,'pos')
@@ -226,10 +231,10 @@ def rwnet2(L,H,Hf,a=0,display=False,analyze=False):
 
     if display==True:
         n='H='+str(H)+',Hf='+str(Hf)+',a='+str(a)+',L='+str(L)
-        nx.draw_networkx(G,pos,node_size=6,with_labels=False)
+        plt.plot(x,y,'ro',markersize=3)
         plt.title(n)
         plt.savefig(n)
-        plt.close()
+        plt.show()
 
     #end = time.time()
     #print(end-start)
@@ -299,6 +304,8 @@ def network(x,y,dstar,display=False,degree=False):
     G: NetworkX graph corresponding to X,Y,dstar
     D: degree distribution, only returned when degree is true
     """
+    plt.close()
+
     l=[]
     g=nx.Graph()
 
@@ -316,11 +323,19 @@ def network(x,y,dstar,display=False,degree=False):
                 g.add_edge(j,l[j][i])
     #print(len(g.node))
     #plt.plot(nx.degree_histogram(g))
-    nx.draw_networkx(g,node_size=6,with_labels=False)
-    plt.title('Connections Network')
-    plt.savefig('Network of points')
-    plt.show()
+    if display==True:
+        nx.draw_networkx(g,node_size=6,with_labels=False)
+        plt.title('Connections Network')
+        plt.savefig('Network of points')
+        plt.show()
 
+    if degree==True:
+        D=nx.degree(g)
+        plt.plot(nx.degree_histogram(g))
+        plt.bar(np.arange(len(nx.degree_histogram(g))),nx.degree_histogram(g))
+        plt.show()
+
+    return g,D
 
 
 if __name__ == '__main__':
